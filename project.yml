@@ -1,0 +1,70 @@
+name: FanCurve
+options:
+  deploymentTarget:
+    macOS: "13.0"
+  developmentLanguage: en
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MACOSX_DEPLOYMENT_TARGET: "13.0"
+    # Version lives here for the Xcode path; build.sh's APP_VERSION is the same value
+    # for the script path (it is verified there, not duplicated per file).
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  FanCurve:
+    type: application
+    platform: macOS
+    sources:
+      - App
+      - Core
+      - Models
+      - ViewModels
+      - Views
+      - Shared
+      - Localization
+    info:
+      path: App/Info.plist
+    dependencies:
+      - target: fancurve-helper
+        embed: false
+    settings:
+      base:
+        PRODUCT_NAME: FanCurve
+        PRODUCT_BUNDLE_IDENTIFIER: com.local.fancurve.app
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        ENABLE_HARDENED_RUNTIME: NO
+        LD_RUNPATH_SEARCH_PATHS: "@executable_path/../Frameworks"
+    postCompileScripts:
+      - name: Install helper into app bundle
+        script: |
+          APP_BUNDLE="${BUILT_PRODUCTS_DIR}/FanCurve.app"
+          install -m 755 "${BUILT_PRODUCTS_DIR}/fancurve-helper" "${APP_BUNDLE}/Contents/MacOS/fancurve-helper"
+          chmod u+s "${APP_BUNDLE}/Contents/MacOS/fancurve-helper" 2>/dev/null || true
+          chown root:wheel "${APP_BUNDLE}/Contents/MacOS/fancurve-helper" 2>/dev/null || true
+          # Ship the launchd plist as the source for the one-time daemon install.
+          mkdir -p "${APP_BUNDLE}/Contents/Library/LaunchDaemons"
+          install -m 644 "${SRCROOT}/Helper/fancurve-helper.plist" "${APP_BUNDLE}/Contents/Library/LaunchDaemons/com.local.fancurve.app.helper.plist"
+          echo "Installed fancurve-helper into ${APP_BUNDLE}"
+        alwaysOutdated: true
+        runOnlyWhenInstalled: false
+  fancurve-helper:
+    type: tool
+    platform: macOS
+    sources:
+      - Core/SMC.swift
+      - Core/SMC+Values.swift
+      - Core/SMC+FanOwnership.swift
+      - Core/SMC+Unlock.swift
+      - Models/FanJSON.swift
+      - Helper/main.swift
+      - Shared/FanCurveHelperProtocol.swift
+    settings:
+      base:
+        PRODUCT_NAME: fancurve-helper
+        PRODUCT_BUNDLE_IDENTIFIER: com.local.fancurve.app.helper
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        ENABLE_HARDENED_RUNTIME: NO
+        MACH_O_TYPE: mh_execute

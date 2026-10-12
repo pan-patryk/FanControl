@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.local.fancurve.app.helper</string>
+	<!-- The binary lives in /Library/fancurve (installed once, with an admin
+	     prompt), deliberately OUTSIDE the app bundle: rebuilding or
+	     reinstalling the app must never break the running control service,
+	     and must never force another authorization prompt. The copy shipped
+	     in the app bundle's Contents/Library/LaunchDaemons is only the source
+	     for that one-time install. -->
+	<key>Program</key>
+	<string>/Library/fancurve/fancurve-helper</string>
+	<key>MachServices</key>
+	<dict>
+		<key>com.local.fancurve.app.helper</key>
+		<true/>
+	</dict>
+	<key>KeepAlive</key>
+	<true/>
+	<!-- launchd.plist(5): ThrottleInterval "lets one override the default throttling
+	     policy imposed on jobs by launchd. The value is in seconds, and by default,
+	     jobs will not be spawned more than once every 10 seconds." The app's liveness
+	     ping waits 2 s, so after a daemon restart (crash, upgrade, `kill`) the 10 s
+	     default is a 10 s window where the app believes it has no fan control. Two
+	     seconds keeps recovery inside the app's own retry schedule. -->
+	<key>ThrottleInterval</key>
+	<integer>2</integer>
+	<key>RunAtLoad</key>
+	<true/>
+	<!-- No StandardOutPath/StandardErrorPath: launchd creates those files as root with
+	     mode 0644 at a predictable, world-readable path, which would leak a user's
+	     thermal activity and confirm to any local process that the daemon is installed.
+	     Without the keys, launchd hands the job's stdout/stderr to the unified log
+	     instead, so `log stream --predicate 'process == "fancurve-helper"'` still shows
+	     everything the daemon writes (it logs to stderr on purpose). -->
+</dict>
+</plist>

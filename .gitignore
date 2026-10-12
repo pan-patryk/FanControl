@@ -1,0 +1,20 @@
+# Build products
+.build/
+*.app
+*.dmg
+*.zip
+/dist/
+/temp_test
+
+# Generated Xcode project (project.yml is the source of truth; build.sh never uses it)
+/FanCurve.xcodeproj
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local tooling state
+.zvec-grep/
+.pi/
+.pi-glla/
+/tools/thermal-load/thermal-load
