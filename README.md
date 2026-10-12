@@ -426,6 +426,19 @@ Issues and pull requests are welcome. Please:
   each of these; a PR that adds a second writer usually looks like a bug that
   took weeks to reproduce.
 
+## Credits
+
+FanCurve began as a fork of
+[Fanny-MacOs-FanControl](https://github.com/ShahzaibAli02/Fanny-MacOs-FanControl)
+by **shahzaib ali** — a SwiftUI fan controller with temperature-triggered
+automation rules, per-sensor history graphs and a privileged SMC helper. Large
+parts have since been rewritten — the menu-bar architecture, the curve engine,
+the privilege model and the build — but the starting point, and the MIT notice
+this project carries, belong to that lineage. Also part of it:
+[AnG-Anthony](https://github.com/AnG-Anthony),
+[leornt](https://github.com/leornt) and
+[jeff-schumann](https://github.com/jeff-schumann).
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
